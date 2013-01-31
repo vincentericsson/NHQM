@@ -71,10 +71,6 @@ class hermitizeTests(unittest.TestCase):
     def testComplex(self):
         pass
         
-#
-# Tests
-#
-        
 class parallel_matrixTests(unittest.TestCase):
     
     def setUp(self):

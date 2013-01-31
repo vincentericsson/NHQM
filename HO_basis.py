@@ -52,19 +52,25 @@ def optimized_eps(V):
     res = optimize.minimize_scalar(ground_energy, bounds=(0, 2), method='bounded')
     return float(res.x) # 1.06384608107
 
+import parallel_matrix as pm
+
+def matrix_fun(i, j):
+    return H_element2(i, j, 0, .5, eps, V)
+
 def hamiltonian(V, N, verbose=False):
     """Calculates the N x N hamiltonian matrix."""
     eps = optimized_eps(V)
     if verbose:
         print "omega", eps
-    H = sp.zeros((N, N))
-    for i in range(N):
-        if verbose:
-            print "rad", i+1
-        for j in range(i+1):
-            H[i, j] = H[j, i] = H_element2(i, j, 0, .5, eps, V)
+    # H = sp.zeros((N, N))
+    #     for i in range(N):
+    #         if verbose:
+    #             print "rad", i+1
+    #         for j in range(i+1):
+    #             H[i, j] = H[j, i] = H_element2(i, j, 0, .5, eps, V)
+    
+    pm.parallel_matrix(matrix_fun, N)
     return H
-
 
 def energies(H):
     return linalg.eigh(H, eigvals_only = True)
