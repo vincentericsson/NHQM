@@ -20,7 +20,7 @@ class GenMatrix:
     def load_potential(self, filename="simple.cl"):
         self.potential="".join(open(filename,'r').readlines())
     # Choose which calculation method to use.
-    def set_method(self,method="mom_space_real.cl"):
+    def set_method(self,method="mom_space_complex.cl"):
         self.method="".join(open(method,'r').readlines())
     def allocate_space(self,type,contour):
         self.size=len(contour[1])
@@ -37,16 +37,18 @@ class GenMatrix:
     def combine_kernel(self,arg=""):
         includes="".join(open("includes.cl",'r').readlines())
         defines="".join(open("defines.cl",'r').readlines())
+        complex="".join(open("complex_operations.cl",'r').readlines())
         helpers="".join(open("helpers_complex.cl",'r').readlines())
         arguments="float ix(int i) {float arr[]={"+arg+"}; return arr[i];}"
         program_string=\
             includes+"\n"+\
             defines+"\n"+\
+            complex+"\n"+\
             arguments+"\n"+\
             helpers+"\n"+\
             self.potential+"\n"+\
             self.method
-        self.kernel=ElementwiseKernel(self.ctx, "int *x,c_float *k,c_float *k_prim,c_float *w, float start, float end, int size, c_float *res", \
+        self.kernel=ElementwiseKernel(self.ctx, "int *x,float2 *k,float2 *k_prim,float2 *w, float start, float end, int size, float2 *res", \
             "res[i]=get_element(x[i],k[i],k_prim[i],w[i],start,end,size)", preamble=program_string)
     def execute_kernel(self, start, end):
         self.kernel(self.gpu_matrix,self.gpu_k,self.gpu_k_prim,self.gpu_w,start,end,self.size,self.gpu_result)

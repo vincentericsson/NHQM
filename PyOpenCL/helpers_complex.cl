@@ -1,17 +1,17 @@
-float j_l(int l, float r)
+
+float2 j_l(int l, float2 r)
 {
     switch (l)
     {
         case 0:
-            if (fabs(r)<0.0001) return 1.0;
-            else return sin(r)/r;
+            return c_div(c_sin(r),r);
         case 1:
-            if (fabs(r)<0.0001) return 0.0;
-            else return (sin(r)/(r*r)-cos(r)/r);
+            return c_sub(c_div(c_sin(r),c_mul(r,r)),c_div(c_cos(r),r));
         case 2:
-            return ((3/(r*r)-1)*sin(r)/r-3*cos(r)/(r*r));
-        case 3:
-            return (-(15/(r*r*r)+6/r)*sin(r)/r-(15/(r*r)-1)*cos(r)/r);
+            return c_sub(c_mul(c_sub(c_div((float2)(3.0f,0.0f),c_mul(r,r)),(float2)(1.0f,0.0f)),c_div(c_sin(r),r)), c_div(c_mul((float2)(3.0f,0.0f),c_cos(r)),c_mul(r,r)));
+            // return (             (               3         /     (r*r)-        1)          *        sin(r)/r  -                      3         *  cos(r) /     (r*r));
+        // case 3:
+            // return (-(15/(r*r*r)+6/r)*sin(r)/r-(15/(r*r)-1)*cos(r)/r);
     }
 }
 float get_gauss_legendre_x_25(int i)

@@ -9,7 +9,7 @@ import sys,os.path
 sys.path.append(os.path.join(os.path.dirname(__file__),'..'))
 from nhqm.calculations import QM as calc
 
-size=1000
+size=5
 
 gm=GenMatrix()
 gm.load_potential("woods-saxon_complex.cl")
