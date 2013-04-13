@@ -9,6 +9,8 @@ import sys,os.path
 sys.path.append(os.path.join(os.path.dirname(__file__),'..'))
 from nhqm.calculations import QM as calc
 
+numpy.set_printoptions(threshold=numpy.nan)
+
 size=5
 
 gm=GenMatrix()
@@ -18,7 +20,8 @@ gm.allocate_space(numpy.complex64,calc.triangle_contour(0.17,0.07,2.5,20))
 gm.combine_kernel("1.0")
 gm.execute_kernel(0,6.0)
 # print gm.get_results().reshape((size,size))
-print gm.get_results()
+print gm.get_results().reshape((60,60))
+print len(gm.get_results())
 
 
 # [eigs,_]=la.eig(gm.get_results().reshape((size,size)))
