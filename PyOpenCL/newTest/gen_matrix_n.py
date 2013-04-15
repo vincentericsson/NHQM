@@ -25,20 +25,19 @@ class GenMatrix:
     # Choose which calculation method to use.
     def set_method(self,method="mom_space_complex.cl"):
         self.method="".join(open(method,'r').readlines())
+    # Generate contour and allocate space on gpu for contour and result.
     def allocate_space(self,x_peak,y_peak,k_max,order,type):
-        [points,weights]=calc.triangle_contour(x_peak,y_peak,k_max,order)
+        [points,weights]=calc.triangle_contour(x_peak,y_peak,k_max,order) # Generate weights.
         self.k_max=k_max
         size=self.size=len(points)
-        # host_matrix=(numpy.array([i for i in range(size**2)])).astype(numpy.int32)
-        host_k=(numpy.array([points[i%size] for i in range(size**2)])).astype(type)
-        host_k_prim=(numpy.array([points[(int)(i/size)] for i in range(size**2)])).astype(type)
-        host_step=(numpy.array([weights[(int)(i/size)] for i in range(size**2)])).astype(type)
-        
-        self.gpu_k=cl_array.to_device(self.ctx,self.queue,host_k)
-        self.gpu_k_prim=cl_array.to_device(self.ctx,self.queue,host_k_prim)
-        self.gpu_step=cl_array.to_device(self.ctx,self.queue,host_step)
-        
-        self.gpu_result=cl_array.empty(self.queue,(size**2,1,),type)
+        host_k=(numpy.array([points[i%size] for i in range(size**2)])).astype(type) # Generate k-matrix.
+        host_k_prim=(numpy.array([points[(int)(i/size)] for i in range(size**2)])).astype(type) # Generate k_prim-matrix.
+        host_step=(numpy.array([weights[(int)(i/size)] for i in range(size**2)])).astype(type) # Generate step-matrix.
+        self.gpu_k=cl_array.to_device(self.ctx,self.queue,host_k) # Flush k to gpu
+        self.gpu_k_prim=cl_array.to_device(self.ctx,self.queue,host_k_prim) # Flush k_prim to gpu.
+        self.gpu_step=cl_array.to_device(self.ctx,self.queue,host_step) # Flush steps to gpu.
+        self.gpu_result=cl_array.empty(self.queue,(size**2,1,),type) # Allocate space for results.
+    # Generate the kernel with the selected helpers, etc.
     def combine_kernel(self,arg=""):
         includes="".join(open("includes.cl",'r').readlines())
         defines="".join(open("defines.cl",'r').readlines())
@@ -55,8 +54,10 @@ class GenMatrix:
             self.method
         self.kernel=ElementwiseKernel(self.ctx, "float start, float end, float2 *step, float2 *k, float2 *k_prim, float2 *res", \
             "res[i]=get_element_berggren(start,end,step[i],k[i],k_prim[i])", preamble=program_string)
+    # Run kernel.
     def execute_kernel(self):
         self.kernel(0.0,self.k_max,self.gpu_step,  self.gpu_k,  self.gpu_k_prim,  self.gpu_result)
+    # Receive results from executed kernel.
     def get_results(self):
         return self.gpu_result.get()
         

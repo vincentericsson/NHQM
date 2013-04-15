@@ -13,10 +13,12 @@ from nhqm.calculations import QM as calc
 
 # size=20
 
+# I think (hope) most things here speaks for itself.
+
 gm=GenMatrix()
 gm.load_potential("woods-saxon_complex.cl")
 gm.set_method("mom_space_complex.cl")
-gm.allocate_space(1.0,1.0,5.0,20,numpy.complex64)
+gm.allocate_space(1.0,0.0,7.0,3,numpy.complex64)
 # gm.allocate_space(size,numpy.float32)
 gm.combine_kernel("1.0")
 gm.execute_kernel()
