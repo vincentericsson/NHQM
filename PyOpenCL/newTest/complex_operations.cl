@@ -12,10 +12,12 @@ float2 c_multiplication(float2 a, float2 b, float2 c, float2 d) {return c_mul(c_
 float2 to_r(float x) {return (float2)(x,0.0f);}
 float2 to_i(float y) {return (float2)(0.0f,y);}
 float2 to_c(float x, float y) {return (float2)(x,y);}
-bool eps_r(float2 z) {return z.x<0.0000000001f;} // Is real part zero?
-bool eps_i(float2 z) {return z.y<0.0000000001f;} // Is imaginary part zero?
+bool apx_eql(float a, float b, int ulp) {return fabs(a-b) <= ulp*FLT_EPSILON*max(fabs(a), fabs(b));}
+bool eps_r(float2 z) {return apx_eql(z.x,0.0f,3);} // Is real part zero?
+bool eps_i(float2 z) {return apx_eql(z.y,0.0f,3);} // Is imaginary part zero?
 bool eps_c(float2 z) {return eps_r(z)&&eps_i(z);} // Is the complex number zero?
 bool eps(float2 z) {return eps_c(z);}
+bool equal(float2 a, float2 b) {return apx_eql(a.x,b.x,3)&&apx_eql(a.x,b.x,3);}
 float real(float2 z) {return z.x;}
 float imag(float2 z) {return z.y;}
 float2 c_real(float2 z) {return to_r(z.x);}
