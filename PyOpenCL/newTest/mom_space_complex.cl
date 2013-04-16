@@ -24,7 +24,7 @@ float2 get_element(int x, float2 start, float2 end, int n)
 {
     // We got k,k_prim,step
     start=c_real(start);
-    end=c_real(end);
+    end=c_real(10.0f);
     float mass=0.019272f;
     float2 sum=to_r(0.0f);
     float2 step=(end-start)/((float)n);
